@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
   Plus, Search, Pencil, Trash2, X, MapPin, User, Wrench,
-  CheckCircle2, AlertTriangle, Clock, Ban
+  CheckCircle2, AlertTriangle, Clock, Ban, Briefcase
 } from 'lucide-react'
+import JobPicker, { JobLabel } from '../../components/JobPicker.jsx'
+import { jobs as jobsCollection } from '../../data/collections.js'
 
 const STORAGE_KEY = 'toolyard.equiptrack.v1'
 
@@ -26,7 +28,8 @@ const SEED = [
     name: 'CAT 320 — #A12',
     type: 'Excavator',
     status: 'in_use',
-    location: 'Maple Ave Jobsite',
+    jobId: null,
+    location: '',
     operator: 'Luis R.',
     lastService: '2026-03-14',
     notes: 'Hydraulic hose replaced. Monitor for leaks.',
@@ -36,7 +39,8 @@ const SEED = [
     name: 'Bobcat S650 — #B04',
     type: 'Skid Steer',
     status: 'available',
-    location: 'Yard',
+    jobId: null,
+    location: '',
     operator: '',
     lastService: '2026-02-20',
     notes: '',
@@ -46,7 +50,8 @@ const SEED = [
     name: 'Genie GS-1930',
     type: 'Other',
     status: 'maintenance',
-    location: 'Shop',
+    jobId: null,
+    location: '',
     operator: '',
     lastService: '2026-04-02',
     notes: 'Battery replacement scheduled this week.',
@@ -69,24 +74,33 @@ export default function EquipTrack() {
   const [query, setQuery] = useState('')
   const [filter, setFilter] = useState('all')
   const [editing, setEditing] = useState(null) // equipment object or 'new' or null
+  const allJobs = jobsCollection.useAll()
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items))
   }, [items])
+
+  const jobNameById = useMemo(() => {
+    const map = new Map()
+    for (const j of allJobs) map.set(j.id, j.name)
+    return map
+  }, [allJobs])
 
   const filtered = useMemo(() => {
     return items.filter((it) => {
       if (filter !== 'all' && it.status !== filter) return false
       if (!query) return true
       const q = query.toLowerCase()
+      const jobName = (it.jobId && jobNameById.get(it.jobId)) || ''
       return (
         it.name.toLowerCase().includes(q) ||
         it.type.toLowerCase().includes(q) ||
         (it.location || '').toLowerCase().includes(q) ||
+        jobName.toLowerCase().includes(q) ||
         (it.operator || '').toLowerCase().includes(q)
       )
     })
-  }, [items, query, filter])
+  }, [items, query, filter, jobNameById])
 
   const counts = useMemo(() => {
     const base = { all: items.length }
@@ -244,10 +258,20 @@ function EquipmentRow({ item, onEdit, onDelete }) {
       </div>
 
       <div className="space-y-1.5 text-sm text-steel-300">
-        {item.location && (
+        {item.jobId ? (
+          <div className="flex items-center gap-2">
+            <Briefcase className="w-3.5 h-3.5 text-steel-500" />
+            <JobLabel id={item.jobId} fallback="Job removed" />
+          </div>
+        ) : item.location ? (
           <div className="flex items-center gap-2">
             <MapPin className="w-3.5 h-3.5 text-steel-500" />
             <span className="truncate">{item.location}</span>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2 text-steel-500">
+            <MapPin className="w-3.5 h-3.5" />
+            <span className="italic">At the shop</span>
           </div>
         )}
         {item.operator && (
@@ -296,6 +320,7 @@ function EditorModal({ equipment, onClose, onSave }) {
       name: '',
       type: 'Excavator',
       status: 'available',
+      jobId: '',
       location: '',
       operator: '',
       lastService: '',
@@ -372,26 +397,23 @@ function EditorModal({ equipment, onClose, onSave }) {
             </Field>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <Field label="Location">
-              <input
-                type="text"
-                value={form.location}
-                onChange={(e) => setField('location', e.target.value)}
-                placeholder="Maple Ave Jobsite"
-                className="ty-input"
-              />
-            </Field>
-            <Field label="Operator">
-              <input
-                type="text"
-                value={form.operator}
-                onChange={(e) => setField('operator', e.target.value)}
-                placeholder="Luis R."
-                className="ty-input"
-              />
-            </Field>
-          </div>
+          <Field label="Assigned to job">
+            <JobPicker
+              value={form.jobId || ''}
+              onChange={(id) => setField('jobId', id)}
+              noneLabel="— At the shop —"
+            />
+          </Field>
+
+          <Field label="Operator">
+            <input
+              type="text"
+              value={form.operator}
+              onChange={(e) => setField('operator', e.target.value)}
+              placeholder="Luis R."
+              className="ty-input"
+            />
+          </Field>
 
           <Field label="Last Service">
             <input

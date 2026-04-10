@@ -5,26 +5,50 @@
 // status: 'live' | 'beta' | 'soon'
 
 import EquipTrack from './equiptrack/EquipTrack.jsx'
+import Office from './office/Office.jsx'
+import Crib from './crib/Crib.jsx'
 import PunchList from './punchlist/PunchList.jsx'
 import DailyLogs from './dailylogs/DailyLogs.jsx'
 import Submittals from './submittals/Submittals.jsx'
 import Bids from './bids/Bids.jsx'
 
 import {
-  HardHat, ClipboardCheck, NotebookPen, FileStack, Calculator
+  HardHat, Building2, Package, ClipboardCheck, NotebookPen, FileStack, Calculator
 } from 'lucide-react'
 
 export const tools = [
+  {
+    slug: 'office',
+    name: 'The Office',
+    tagline: 'Your shops and jobs, one list.',
+    description:
+      'Central directory of shops and jobs. Every other tool in the yard reads from here — add a job once, pick it from anywhere.',
+    icon: Building2,
+    status: 'live',
+    accent: 'safety',
+    component: Office,
+  },
   {
     slug: 'equiptrack',
     name: 'EquipTrack',
     tagline: 'Know where every machine is.',
     description:
-      'Track equipment across jobsites — status, location, operator, and service history. The first tool in the yard.',
+      'Track equipment across jobsites — status, assigned job, operator, and service history. The first tool in the yard.',
     icon: HardHat,
     status: 'live',
     accent: 'safety',
     component: EquipTrack,
+  },
+  {
+    slug: 'crib',
+    name: 'The Crib',
+    tagline: 'Pull it. Bill it. Restock it.',
+    description:
+      'Shop materials inventory with low-stock alerts, pull log, and per-job billing totals.',
+    icon: Package,
+    status: 'live',
+    accent: 'caution',
+    component: Crib,
   },
   {
     slug: 'punchlist',
