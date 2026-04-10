@@ -7,13 +7,16 @@
 import EquipTrack from './equiptrack/EquipTrack.jsx'
 import Office from './office/Office.jsx'
 import Crib from './crib/Crib.jsx'
+import QuickQuote from './quickquote/QuickQuote.jsx'
+import ChangeOrders from './changeorders/ChangeOrders.jsx'
 import PunchList from './punchlist/PunchList.jsx'
 import DailyLogs from './dailylogs/DailyLogs.jsx'
 import Submittals from './submittals/Submittals.jsx'
 import Bids from './bids/Bids.jsx'
 
 import {
-  HardHat, Building2, Package, ClipboardCheck, NotebookPen, FileStack, Calculator
+  HardHat, Building2, Package, FileText, FileWarning,
+  ClipboardCheck, NotebookPen, FileStack, Calculator
 } from 'lucide-react'
 
 export const tools = [
@@ -49,6 +52,28 @@ export const tools = [
     status: 'live',
     accent: 'caution',
     component: Crib,
+  },
+  {
+    slug: 'quickquote',
+    name: 'QuickQuote',
+    tagline: 'Price it. Send it. Win it.',
+    description:
+      'Fast quotes for small projects. Pick a customer, drop in services from the catalog or type them free-form, then print or email the PDF.',
+    icon: FileText,
+    status: 'live',
+    accent: 'safety',
+    component: QuickQuote,
+  },
+  {
+    slug: 'changeorders',
+    name: 'Change Orders',
+    tagline: 'Bill the extras, track the job.',
+    description:
+      'Log change orders against a running job and roll them up with the original quote into per-job totals.',
+    icon: FileWarning,
+    status: 'live',
+    accent: 'caution',
+    component: ChangeOrders,
   },
   {
     slug: 'punchlist',

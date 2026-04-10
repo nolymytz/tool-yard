@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import {
   Building2, Briefcase, Plus, Pencil, Trash2, X, MapPin, User, Hash, CalendarDays,
+  Users, Phone, Mail,
 } from 'lucide-react'
-import { shops, jobs, JOB_STATUSES } from '../../data/collections.js'
+import { shops, jobs, customers, JOB_STATUSES } from '../../data/collections.js'
 
 const TAB_SHOPS = 'shops'
 const TAB_JOBS = 'jobs'
+const TAB_CUSTOMERS = 'customers'
 
 const statusMeta = (key) =>
   ({
@@ -34,7 +36,7 @@ export default function Office() {
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b-2 border-steel-700 mb-6">
+      <div className="flex border-b-2 border-steel-700 mb-6 flex-wrap">
         <TabButton
           active={tab === TAB_SHOPS}
           onClick={() => setTab(TAB_SHOPS)}
@@ -49,9 +51,18 @@ export default function Office() {
           label="Jobs"
           count={jobs.useAll().length}
         />
+        <TabButton
+          active={tab === TAB_CUSTOMERS}
+          onClick={() => setTab(TAB_CUSTOMERS)}
+          Icon={Users}
+          label="Customers"
+          count={customers.useAll().length}
+        />
       </div>
 
-      {tab === TAB_SHOPS ? <ShopsPanel /> : <JobsPanel />}
+      {tab === TAB_SHOPS && <ShopsPanel />}
+      {tab === TAB_JOBS && <JobsPanel />}
+      {tab === TAB_CUSTOMERS && <CustomersPanel />}
     </div>
   )
 }
@@ -406,6 +417,193 @@ function JobModal({ job, onClose, onSave }) {
           </Field>
         </div>
         <ModalFooter onClose={onClose} submitLabel={job ? 'Save changes' : 'Add job'} />
+      </form>
+    </Modal>
+  )
+}
+
+// ---------- Customers ----------
+
+function CustomersPanel() {
+  const allCustomers = customers.useAll()
+  const [editing, setEditing] = useState(null)
+
+  return (
+    <>
+      <div className="flex justify-end mb-4">
+        <button className="ty-btn-safety" onClick={() => setEditing('new')}>
+          <Plus className="w-4 h-4" strokeWidth={3} />
+          Add Customer
+        </button>
+      </div>
+
+      {allCustomers.length === 0 ? (
+        <EmptyState
+          Icon={Users}
+          title="No customers yet"
+          body="Add the people and companies you bill — quotes and change orders pull from this list."
+        />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {allCustomers.map((c) => (
+            <div key={c.id} className="ty-card p-5">
+              <div className="flex items-start justify-between gap-4 mb-3">
+                <div className="min-w-0">
+                  <div className="font-stencil text-lg uppercase tracking-wide text-steel-100 truncate">
+                    {c.name}
+                  </div>
+                  {c.contactName && (
+                    <div className="text-xs text-safety mt-0.5 truncate">
+                      {c.contactName}
+                    </div>
+                  )}
+                </div>
+                <div className="flex gap-1 shrink-0">
+                  <IconButton onClick={() => setEditing(c)} title="Edit">
+                    <Pencil className="w-4 h-4" />
+                  </IconButton>
+                  <IconButton
+                    onClick={() => {
+                      if (confirm(`Delete customer "${c.name}"? Past quotes keep their snapshot.`)) {
+                        customers.remove(c.id)
+                      }
+                    }}
+                    title="Delete"
+                    danger
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </IconButton>
+                </div>
+              </div>
+
+              <div className="space-y-1.5 text-sm text-steel-300">
+                {c.email && (
+                  <div className="flex items-center gap-2 min-w-0">
+                    <Mail className="w-3.5 h-3.5 text-steel-500 shrink-0" />
+                    <a
+                      href={`mailto:${c.email}`}
+                      className="truncate hover:text-safety"
+                    >
+                      {c.email}
+                    </a>
+                  </div>
+                )}
+                {c.phone && (
+                  <div className="flex items-center gap-2">
+                    <Phone className="w-3.5 h-3.5 text-steel-500" />
+                    <span>{c.phone}</span>
+                  </div>
+                )}
+                {c.address && (
+                  <div className="flex items-center gap-2 min-w-0">
+                    <MapPin className="w-3.5 h-3.5 text-steel-500 shrink-0" />
+                    <span className="truncate">{c.address}</span>
+                  </div>
+                )}
+              </div>
+
+              {c.notes && (
+                <p className="text-xs text-steel-500 italic border-l-2 border-steel-700 pl-3 mt-3">
+                  {c.notes}
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {editing && (
+        <CustomerModal
+          customer={editing === 'new' ? null : editing}
+          onClose={() => setEditing(null)}
+          onSave={(data) => {
+            customers.upsert(editing === 'new' ? data : { ...editing, ...data })
+            setEditing(null)
+          }}
+        />
+      )}
+    </>
+  )
+}
+
+function CustomerModal({ customer, onClose, onSave }) {
+  const [form, setForm] = useState(
+    customer || {
+      name: '',
+      contactName: '',
+      email: '',
+      phone: '',
+      address: '',
+      notes: '',
+    }
+  )
+  const setField = (k, v) => setForm((f) => ({ ...f, [k]: v }))
+  const submit = (e) => {
+    e.preventDefault()
+    if (!form.name.trim()) return
+    onSave(form)
+  }
+  return (
+    <Modal title={customer ? 'Edit Customer' : 'Add Customer'} onClose={onClose}>
+      <form onSubmit={submit} className="space-y-4">
+        <Field label="Customer name *">
+          <input
+            required
+            autoFocus
+            value={form.name}
+            onChange={(e) => setField('name', e.target.value)}
+            placeholder="The Whitlocks"
+            className="ty-input"
+          />
+        </Field>
+        <Field label="Contact person">
+          <input
+            value={form.contactName}
+            onChange={(e) => setField('contactName', e.target.value)}
+            placeholder="Sarah Whitlock"
+            className="ty-input"
+          />
+        </Field>
+        <div className="grid grid-cols-2 gap-4">
+          <Field label="Email">
+            <input
+              type="email"
+              value={form.email}
+              onChange={(e) => setField('email', e.target.value)}
+              placeholder="sarah@example.com"
+              className="ty-input"
+            />
+          </Field>
+          <Field label="Phone">
+            <input
+              type="tel"
+              value={form.phone}
+              onChange={(e) => setField('phone', e.target.value)}
+              placeholder="(555) 555-0142"
+              className="ty-input"
+            />
+          </Field>
+        </div>
+        <Field label="Billing address">
+          <input
+            value={form.address}
+            onChange={(e) => setField('address', e.target.value)}
+            placeholder="1124 Maple Ave"
+            className="ty-input"
+          />
+        </Field>
+        <Field label="Notes">
+          <textarea
+            rows="3"
+            value={form.notes}
+            onChange={(e) => setField('notes', e.target.value)}
+            className="ty-input resize-none"
+          />
+        </Field>
+        <ModalFooter
+          onClose={onClose}
+          submitLabel={customer ? 'Save changes' : 'Add customer'}
+        />
       </form>
     </Modal>
   )

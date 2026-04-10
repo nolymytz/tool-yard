@@ -112,3 +112,76 @@ export const materials = createCollection('crib.materials', [
 // append-mostly; we keep snapshots of material name, unit, cost, and job
 // name so the history survives later edits or deletes.
 export const cribPulls = createCollection('crib.pulls', [])
+
+// --- Customers ---
+// A customer is the party a quote or change order is billed to. Jobs can
+// optionally reference a customer by id; quotes and change orders always do.
+export const customers = createCollection('customers', [
+  {
+    name: 'The Whitlocks',
+    contactName: 'Sarah Whitlock',
+    email: 'sarah.whitlock@example.com',
+    phone: '(555) 555-0142',
+    address: '1124 Maple Ave',
+    notes: '',
+  },
+  {
+    name: 'Ember Coffee Co.',
+    contactName: 'Miguel Ortega',
+    email: 'miguel@embercoffee.co',
+    phone: '(555) 555-0187',
+    address: '88 S Main St, Suite 2',
+    notes: 'Downtown cafe buildout client.',
+  },
+])
+
+// --- Service Catalog ---
+// A reusable list of priced line items that Quotes and Change Orders can
+// drop into a document with one click. Rates are stored per-unit; the
+// quote/CO line item snapshots description + rate at the moment of use so
+// later edits to the catalog don't retroactively change old documents.
+export const SERVICE_UNITS = [
+  'hour',
+  'day',
+  'each',
+  'sq ft',
+  'linear ft',
+  'cu yd',
+  'lump sum',
+]
+
+export const services = createCollection('services', [
+  { name: 'General Labor',         description: 'Skilled construction labor',         unit: 'hour',      rate: 85 },
+  { name: 'Lead Carpenter',        description: 'Lead carpenter on-site',             unit: 'hour',      rate: 125 },
+  { name: 'Project Management',    description: 'PM / site supervision',              unit: 'hour',      rate: 110 },
+  { name: 'Interior Demolition',   description: 'Demo and haul-away',                 unit: 'hour',      rate: 95 },
+  { name: 'Drywall Hang & Finish', description: 'Hang, tape, mud, sand',              unit: 'sq ft',     rate: 3.75 },
+  { name: 'Interior Paint',        description: 'Two coats, minor prep',              unit: 'sq ft',     rate: 2.50 },
+  { name: 'Trim & Baseboard',      description: 'Install paint-grade trim',           unit: 'linear ft', rate: 6 },
+  { name: 'Interior Door Install', description: 'Hang pre-hung interior door',        unit: 'each',      rate: 275 },
+])
+
+// --- Quotes ---
+// A quote is a priced proposal issued to a customer, optionally linked to a
+// job. Status moves from draft → sent → accepted/declined.
+export const QUOTE_STATUSES = [
+  { key: 'draft',    label: 'Draft' },
+  { key: 'sent',     label: 'Sent' },
+  { key: 'accepted', label: 'Accepted' },
+  { key: 'declined', label: 'Declined' },
+]
+
+export const quotes = createCollection('quotes', [])
+
+// --- Change Orders ---
+// A change order is a priced addition to an already-running job. Change
+// orders are ALWAYS tied to a job id, and roll up into per-job totals so
+// the user can see original quote + approved COs per project.
+export const CHANGE_ORDER_STATUSES = [
+  { key: 'draft',    label: 'Draft' },
+  { key: 'sent',     label: 'Sent' },
+  { key: 'approved', label: 'Approved' },
+  { key: 'rejected', label: 'Rejected' },
+]
+
+export const changeOrders = createCollection('changeOrders', [])
