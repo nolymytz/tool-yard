@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body, #root {
+    height: 100%;
+  }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background-color: #0d1014;
+    color: #e4e6e9;
+  }
+  h1, h2, h3, h4 {
+    font-family: 'Oswald', 'Impact', system-ui, sans-serif;
+    letter-spacing: 0.01em;
+  }
+}
+
+@layer components {
+  .ty-btn {
+    @apply inline-flex items-center gap-2 px-4 py-2 font-stencil uppercase tracking-wider
+           border-2 border-steel-100 text-steel-100 hover:bg-steel-100 hover:text-steel-900
+           transition-colors duration-150;
+  }
+  .ty-btn-safety {
+    @apply inline-flex items-center gap-2 px-4 py-2 font-stencil uppercase tracking-wider
+           bg-safety text-steel-900 border-2 border-safety hover:bg-safety-400
+           hover:border-safety-400 transition-colors duration-150;
+  }
+  .ty-card {
+    @apply relative bg-steel-800 border-2 border-steel-700 hover:border-safety
+           transition-colors duration-150;
+  }
+  .ty-chip {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 text-xs font-stencil uppercase
+           tracking-wider border border-steel-600 text-steel-300;
+  }
+}
+
+/* Subtle grid texture overlay on the steel background */
+.bg-steel-textured {
+  background-image:
+    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
