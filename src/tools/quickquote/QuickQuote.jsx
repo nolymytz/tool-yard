@@ -415,6 +415,7 @@ function QuoteEditor({ quote, onClose, onPreview }) {
             <CustomerPicker
               value={form.customerId}
               onChange={(id) => setField('customerId', id)}
+              allowAdd
             />
           </Field>
           <Field label="Link to job (optional)">
