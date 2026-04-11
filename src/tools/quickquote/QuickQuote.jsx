@@ -42,6 +42,12 @@ export default function QuickQuote() {
   const [editing, setEditing] = useState(null) // quote object, 'new', or null
   const [printing, setPrinting] = useState(null) // quote object or null
 
+  // IMPORTANT: call all hooks unconditionally at the top of the component,
+  // before any early return. Calling useAll() inline inside JSX that only
+  // renders on some branches violates the Rules of Hooks.
+  const quotesCount = quotes.useAll().length
+  const servicesCount = servicesCollection.useAll().length
+
   if (editing) {
     return (
       <QuoteEditor
@@ -82,14 +88,14 @@ export default function QuickQuote() {
           onClick={() => setTab(TAB_QUOTES)}
           Icon={FileText}
           label="Quotes"
-          count={quotes.useAll().length}
+          count={quotesCount}
         />
         <TabButton
           active={tab === TAB_SERVICES}
           onClick={() => setTab(TAB_SERVICES)}
           Icon={Package}
           label="Service Catalog"
-          count={servicesCollection.useAll().length}
+          count={servicesCount}
         />
       </div>
 
