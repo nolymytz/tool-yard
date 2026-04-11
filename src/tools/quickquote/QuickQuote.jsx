@@ -9,6 +9,7 @@ import {
   customers,
   services as servicesCollection,
   jobs,
+  customerAddressLines,
   SERVICE_UNITS,
   QUOTE_STATUSES,
 } from '../../data/collections.js'
@@ -360,7 +361,9 @@ function QuoteEditor({ quote, onClose, onPreview }) {
       ...form,
       customerName: customer ? customer.name : form.customerName || '',
       customerEmail: customer ? customer.email : form.customerEmail || '',
-      customerAddress: customer ? customer.address : form.customerAddress || '',
+      customerAddress: customer
+        ? customerAddressLines(customer).join('\n')
+        : form.customerAddress || '',
       customerContact: customer ? customer.contactName : form.customerContact || '',
       jobName: job ? job.name : '',
       taxRate: Number(form.taxRate) || 0,
@@ -765,11 +768,16 @@ Thanks!
                   {customer?.contactName || quote.customerContact}
                 </div>
               )}
-              {(customer?.address || quote.customerAddress) && (
-                <div className="text-sm text-gray-700">
-                  {customer?.address || quote.customerAddress}
-                </div>
-              )}
+              {(() => {
+                const lines = customer
+                  ? customerAddressLines(customer)
+                  : (quote.customerAddress || '').split('\n').filter(Boolean)
+                return lines.length > 0 ? (
+                  <div className="text-sm text-gray-700 whitespace-pre-line">
+                    {lines.join('\n')}
+                  </div>
+                ) : null
+              })()}
               {(customer?.email || quote.customerEmail) && (
                 <div className="text-sm text-gray-700">
                   {customer?.email || quote.customerEmail}

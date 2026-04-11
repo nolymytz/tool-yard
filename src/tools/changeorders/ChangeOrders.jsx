@@ -9,6 +9,7 @@ import {
   customers,
   jobs,
   services as servicesCollection,
+  customerAddressLines,
   SERVICE_UNITS,
   CHANGE_ORDER_STATUSES,
 } from '../../data/collections.js'
@@ -539,7 +540,9 @@ function ChangeOrderEditor({ changeOrder, onClose, onPreview }) {
       jobName: job ? job.name : form.jobName || '',
       customerName: customer ? customer.name : form.customerName || '',
       customerEmail: customer ? customer.email : form.customerEmail || '',
-      customerAddress: customer ? customer.address : form.customerAddress || '',
+      customerAddress: customer
+        ? customerAddressLines(customer).join('\n')
+        : form.customerAddress || '',
       customerContact: customer
         ? customer.contactName
         : form.customerContact || '',
@@ -915,11 +918,18 @@ Thanks!
                   {customer?.contactName || changeOrder.customerContact}
                 </div>
               )}
-              {(customer?.address || changeOrder.customerAddress) && (
-                <div className="text-sm text-gray-700">
-                  {customer?.address || changeOrder.customerAddress}
-                </div>
-              )}
+              {(() => {
+                const lines = customer
+                  ? customerAddressLines(customer)
+                  : (changeOrder.customerAddress || '')
+                      .split('\n')
+                      .filter(Boolean)
+                return lines.length > 0 ? (
+                  <div className="text-sm text-gray-700 whitespace-pre-line">
+                    {lines.join('\n')}
+                  </div>
+                ) : null
+              })()}
             </div>
             <div>
               <div className="text-xs uppercase tracking-widest text-gray-500 mb-1">

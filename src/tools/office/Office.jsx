@@ -3,7 +3,13 @@ import {
   Building2, Briefcase, Plus, Pencil, Trash2, X, MapPin, User, Hash, CalendarDays,
   Users, Phone, Mail,
 } from 'lucide-react'
-import { shops, jobs, customers, JOB_STATUSES } from '../../data/collections.js'
+import {
+  shops,
+  jobs,
+  customers,
+  customerAddressLines,
+  JOB_STATUSES,
+} from '../../data/collections.js'
 
 const TAB_SHOPS = 'shops'
 const TAB_JOBS = 'jobs'
@@ -494,10 +500,16 @@ function CustomersPanel() {
                     <span>{c.phone}</span>
                   </div>
                 )}
-                {c.address && (
-                  <div className="flex items-center gap-2 min-w-0">
-                    <MapPin className="w-3.5 h-3.5 text-steel-500 shrink-0" />
-                    <span className="truncate">{c.address}</span>
+                {customerAddressLines(c).length > 0 && (
+                  <div className="flex items-start gap-2 min-w-0">
+                    <MapPin className="w-3.5 h-3.5 text-steel-500 shrink-0 mt-0.5" />
+                    <div className="min-w-0">
+                      {customerAddressLines(c).map((line, i) => (
+                        <div key={i} className="truncate">
+                          {line}
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
@@ -527,16 +539,19 @@ function CustomersPanel() {
 }
 
 function CustomerModal({ customer, onClose, onSave }) {
-  const [form, setForm] = useState(
-    customer || {
-      name: '',
-      contactName: '',
-      email: '',
-      phone: '',
-      address: '',
-      notes: '',
-    }
-  )
+  const [form, setForm] = useState(() => ({
+    name: '',
+    contactName: '',
+    email: '',
+    phone: '',
+    address: '',
+    address2: '',
+    city: '',
+    state: '',
+    zip: '',
+    notes: '',
+    ...(customer || {}),
+  }))
   const setField = (k, v) => setForm((f) => ({ ...f, [k]: v }))
   const submit = (e) => {
     e.preventDefault()
@@ -584,7 +599,7 @@ function CustomerModal({ customer, onClose, onSave }) {
             />
           </Field>
         </div>
-        <Field label="Billing address">
+        <Field label="Address">
           <input
             value={form.address}
             onChange={(e) => setField('address', e.target.value)}
@@ -592,6 +607,43 @@ function CustomerModal({ customer, onClose, onSave }) {
             className="ty-input"
           />
         </Field>
+        <Field label="Address 2">
+          <input
+            value={form.address2 || ''}
+            onChange={(e) => setField('address2', e.target.value)}
+            placeholder="Suite, apt, unit, etc."
+            className="ty-input"
+          />
+        </Field>
+        <div className="grid grid-cols-[1fr_6rem_7rem] gap-4">
+          <Field label="City">
+            <input
+              value={form.city || ''}
+              onChange={(e) => setField('city', e.target.value)}
+              placeholder="Cedar Falls"
+              className="ty-input"
+            />
+          </Field>
+          <Field label="State">
+            <input
+              value={form.state || ''}
+              onChange={(e) =>
+                setField('state', e.target.value.toUpperCase())
+              }
+              maxLength={2}
+              placeholder="IA"
+              className="ty-input uppercase"
+            />
+          </Field>
+          <Field label="Zip">
+            <input
+              value={form.zip || ''}
+              onChange={(e) => setField('zip', e.target.value)}
+              placeholder="50613"
+              className="ty-input"
+            />
+          </Field>
+        </div>
         <Field label="Notes">
           <textarea
             rows="3"

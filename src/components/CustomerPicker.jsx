@@ -150,6 +150,10 @@ function InlineCustomerModal({ onClose, onSave }) {
     email: '',
     phone: '',
     address: '',
+    address2: '',
+    city: '',
+    state: '',
+    zip: '',
     notes: '',
   })
   const setField = (k, v) => setForm((f) => ({ ...f, [k]: v }))
@@ -236,7 +240,7 @@ function InlineCustomerModal({ onClose, onSave }) {
           </div>
           <label className="block">
             <span className="block text-xs font-stencil uppercase tracking-widest text-steel-400 mb-1.5">
-              Billing address
+              Address
             </span>
             <input
               value={form.address}
@@ -245,6 +249,55 @@ function InlineCustomerModal({ onClose, onSave }) {
               className="ip-inline"
             />
           </label>
+          <label className="block">
+            <span className="block text-xs font-stencil uppercase tracking-widest text-steel-400 mb-1.5">
+              Address 2
+            </span>
+            <input
+              value={form.address2}
+              onChange={(e) => setField('address2', e.target.value)}
+              placeholder="Suite, apt, unit, etc."
+              className="ip-inline"
+            />
+          </label>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-[1fr_6rem_7rem]">
+            <label className="block">
+              <span className="block text-xs font-stencil uppercase tracking-widest text-steel-400 mb-1.5">
+                City
+              </span>
+              <input
+                value={form.city}
+                onChange={(e) => setField('city', e.target.value)}
+                placeholder="Cedar Falls"
+                className="ip-inline"
+              />
+            </label>
+            <label className="block">
+              <span className="block text-xs font-stencil uppercase tracking-widest text-steel-400 mb-1.5">
+                State
+              </span>
+              <input
+                value={form.state}
+                onChange={(e) =>
+                  setField('state', e.target.value.toUpperCase())
+                }
+                maxLength={2}
+                placeholder="IA"
+                className="ip-inline uppercase"
+              />
+            </label>
+            <label className="block">
+              <span className="block text-xs font-stencil uppercase tracking-widest text-steel-400 mb-1.5">
+                Zip
+              </span>
+              <input
+                value={form.zip}
+                onChange={(e) => setField('zip', e.target.value)}
+                placeholder="50613"
+                className="ip-inline"
+              />
+            </label>
+          </div>
           <label className="block">
             <span className="block text-xs font-stencil uppercase tracking-widest text-steel-400 mb-1.5">
               Notes

@@ -123,6 +123,10 @@ export const customers = createCollection('customers', [
     email: 'sarah.whitlock@example.com',
     phone: '(555) 555-0142',
     address: '1124 Maple Ave',
+    address2: '',
+    city: 'Cedar Falls',
+    state: 'IA',
+    zip: '50613',
     notes: '',
   },
   {
@@ -130,10 +134,37 @@ export const customers = createCollection('customers', [
     contactName: 'Miguel Ortega',
     email: 'miguel@embercoffee.co',
     phone: '(555) 555-0187',
-    address: '88 S Main St, Suite 2',
+    address: '88 S Main St',
+    address2: 'Suite 2',
+    city: 'Cedar Falls',
+    state: 'IA',
+    zip: '50613',
     notes: 'Downtown cafe buildout client.',
   },
 ])
+
+/**
+ * Format a customer's address for display or snapshotting.
+ * Returns either an array of non-empty lines (for multi-line display) or a
+ * single joined string. Accepts partial records so old saved customers that
+ * only have `address` still render cleanly.
+ */
+export function customerAddressLines(customer) {
+  if (!customer) return []
+  const line1 = (customer.address || '').trim()
+  const line2 = (customer.address2 || '').trim()
+  const city = (customer.city || '').trim()
+  const state = (customer.state || '').trim()
+  const zip = (customer.zip || '').trim()
+  const cityLine = [city, [state, zip].filter(Boolean).join(' ').trim()]
+    .filter(Boolean)
+    .join(', ')
+  return [line1, line2, cityLine].filter(Boolean)
+}
+
+export function customerAddressOneLine(customer) {
+  return customerAddressLines(customer).join(', ')
+}
 
 // --- Service Catalog ---
 // A reusable list of priced line items that Quotes and Change Orders can
